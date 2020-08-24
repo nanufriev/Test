@@ -796,6 +796,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96b5b89330419c24e93bb441f1da7159, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AddItemInInventory:
+    m_PersistentCalls:
+      m_Calls: []
+  RemoveItemFromInventory:
+    m_PersistentCalls:
+      m_Calls: []
   _dragger: {fileID: 738165425}
   _inventoryItems:
   - {fileID: 603025971}
@@ -1579,4 +1585,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4d4d2c3f35b5f34c816defe1a0ed533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _inventoryButton: {fileID: 0}

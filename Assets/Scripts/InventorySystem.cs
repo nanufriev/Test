@@ -1,9 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class InventorySystem : MonoBehaviour
 {
+    public ItemEventAction AddItemInInventory;
+    public ItemEventAction RemoveItemFromInventory;
+
     [SerializeField]
     private ItemDragSystem _dragger;
 
@@ -53,6 +58,7 @@ public class InventorySystem : MonoBehaviour
                 _choosenItem.SetNewStartPos(slot.transform.position);
                 slot.InventoryItem = _choosenItem;
                 _savedItems.Remove(_choosenItem.Item);
+                RemoveItemFromInventory?.Invoke(_choosenItem.Item.ItemID);
                 _choosenItem = null;
                 break;
             }
@@ -82,6 +88,7 @@ public class InventorySystem : MonoBehaviour
                 item.SetNewStartPos(slot.transform.position);
                 slot.InventoryItem = item;
                 _savedItems.Add(item.Item);
+                AddItemInInventory?.Invoke(item.Item.ItemID);
                 break;
             }
         }
@@ -123,3 +130,12 @@ public class InventorySystem : MonoBehaviour
         _dragger.BeginDrag(item);
     }
 }
+
+public enum ActionType
+{
+    Add = 0,
+    Remove = 1
+}
+
+[Serializable]
+public class ItemEventAction : UnityEvent<int> { }

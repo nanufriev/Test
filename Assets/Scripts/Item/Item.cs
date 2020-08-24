@@ -10,7 +10,7 @@ public class Item
     [SerializeField]
     public bool InInventory { get; set; }
     public Sprite ItemIcon => _itemSettings.Icon;
-
+    public int ItemID => _itemSettings.ItemID;
     
     public Item(ItemSettings itemSettings)
     {

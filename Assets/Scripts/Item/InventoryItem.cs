@@ -26,12 +26,6 @@ public class InventoryItem : MonoBehaviour, IBeginDragHandler, IEndDragHandler, 
         _itemImage.sprite = _item.ItemIcon;
     }
 
-    public void Initialize(Item item)
-    {
-        _item = item;
-        _itemImage.sprite = item.ItemIcon;
-    }
-
     public void ChangeSlot()
     {
         OnChangeSlot();
