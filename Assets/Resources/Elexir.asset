@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7665ae4a4834dd4dae24c10506014f1, type: 3}
+  m_Name: Elexir
+  m_EditorClassIdentifier: 
+  _id: 0
+  _name: "\u042D\u043B\u0435\u043A\u0441\u0438\u0440"
+  _weight: 0.1
+  _icon: {fileID: 21300000, guid: c8124cc33e9590c4fabc68929c0cc23e, type: 3}
