@@ -33,9 +33,9 @@ public class InventorySystem : MonoBehaviour
         foreach (var item in _inventoryItems)
         {
             if (item.Item.InInventory)
-                PushItemInInventory(item);
+                PushItemInInventory(item, true);
             else
-                PushItemInDrop(item);
+                PushItemInDrop(item, true);
 
             item.OnBeginDragEvent += OnBeginDragItem;
             item.OnEndDragEvent += OnEndDragItem;
@@ -44,7 +44,7 @@ public class InventorySystem : MonoBehaviour
         }
 
         _inventoryButton.OnPointerUp += InventoryButtonOnPointerUp;
-        _dragger.OnItemDropEvent += PushItemInInventory;
+        _dragger.OnItemDropEvent += OnItemDropInInventory;
 
         _inventoryButton.AddListener(InventorySwitchState);
     }
@@ -55,6 +55,11 @@ public class InventorySystem : MonoBehaviour
             return;
 
         PushItemInDrop(_choosenItem);
+    }
+
+    private void OnItemDropInInventory(InventoryItem item)
+    {
+        PushItemInInventory(item);
     }
 
     private void OnPointerExitItem(InventoryItem item)
@@ -68,7 +73,7 @@ public class InventorySystem : MonoBehaviour
         _choosenItem = item;
     }
 
-    private void PushItemInDrop(InventoryItem item)
+    private void PushItemInDrop(InventoryItem item, bool mute = false)
     {
         foreach (var slot in _droppedSlots)
         {
@@ -77,13 +82,19 @@ public class InventorySystem : MonoBehaviour
                 item.Item.InInventory = false;
                 _savedItems.Remove(item.Item);
                 ChangeSlot(item, slot);
-                RemoveItemFromInventory?.Invoke(item.Item.ItemID);
+
+                if (!mute)
+                {
+                    RemoveItemFromInventory?.Invoke(item.Item.ItemID);
+                    _saveLoadSystem.SaveData(_savedItems);
+                }
+
                 break;
             }
         }
     }
 
-    private void PushItemInInventory(InventoryItem item)
+    private void PushItemInInventory(InventoryItem item, bool mute = false)
     {
         foreach (var slot in _inventorySlots)
         {
@@ -92,7 +103,12 @@ public class InventorySystem : MonoBehaviour
                 item.Item.InInventory = true;
                 _savedItems.Add(item.Item);
                 ChangeSlot(item, slot);
-                AddItemInInventory?.Invoke(item.Item.ItemID);
+
+                if (!mute)
+                {
+                    AddItemInInventory?.Invoke(item.Item.ItemID);
+                    _saveLoadSystem.SaveData(_savedItems);
+                }
                 break;
             }
         }
@@ -118,8 +134,6 @@ public class InventorySystem : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        _saveLoadSystem.SaveData(_savedItems);
-
         foreach (var item in _inventoryItems)
         {
             item.OnBeginDragEvent -= OnBeginDragItem;
@@ -130,7 +144,7 @@ public class InventorySystem : MonoBehaviour
 
         _inventoryButton.OnPointerUp -= InventoryButtonOnPointerUp;
 
-        _dragger.OnItemDropEvent -= PushItemInInventory;
+        _dragger.OnItemDropEvent -= OnItemDropInInventory;
 
         _inventoryButton.RemoveListeners(InventorySwitchState);
     }
@@ -145,12 +159,6 @@ public class InventorySystem : MonoBehaviour
     {
         _dragger.BeginDrag(item);
     }
-}
-
-public enum ActionType
-{
-    Add = 0,
-    Remove = 1
 }
 
 [Serializable]
