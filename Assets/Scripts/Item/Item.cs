@@ -8,7 +8,7 @@ public class Item
     private ItemSettings _itemSettings;
 
     [SerializeField]
-    public bool InInventory { get; set; }
+    public bool InInventory { get; set; } = false;
     public Sprite ItemIcon => _itemSettings.Icon;
     public int ItemID => _itemSettings.ItemID;
     

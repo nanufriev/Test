@@ -16,8 +16,13 @@ public class ItemDragSystem : MonoBehaviour
     {
         foreach (var target in _targets)
         {
-            target.OnItemDropEvent += OnItemDropEvent;
+            target.OnItemDropEvent += OnItemDrop;
         }
+    }
+
+    private void OnItemDrop(InventoryItem item)
+    {
+        OnItemDropEvent(item);
     }
 
     public void BeginDrag(InventoryItem item)
@@ -36,7 +41,7 @@ public class ItemDragSystem : MonoBehaviour
     {
         foreach (var target in _targets)
         {
-            target.OnItemDropEvent -= OnItemDropEvent;
+            target.OnItemDropEvent -= OnItemDrop;
         }
     }
 }

@@ -26,6 +26,9 @@ public class ItemSlot : MonoBehaviour
 
     private void OnChangeItem()
     {
+        if (_inventoryItem == null)
+            return;
+
         _inventoryItem.OnChangeSlot -= OnChangeItem;
         _inventoryItem = null;
     }

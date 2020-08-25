@@ -13,15 +13,16 @@ public class InventoryItem : MonoBehaviour, IBeginDragHandler, IEndDragHandler, 
 
     private Image _itemImage;
 
-    [SerializeField]
     private Item _item;
 
     private Vector3 _startPos;
 
     public Item Item => _item;
 
-    private void Awake()
+    public void Initialzie(Item item)
     {
+        _item = item;
+
         _itemImage = GetComponent<Image>();
         _itemImage.sprite = _item.ItemIcon;
     }

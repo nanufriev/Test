@@ -23,14 +23,26 @@ public class InventorySystem : MonoBehaviour
     [SerializeField]
     private List<ItemSlot> _inventorySlots;
 
+    [SerializeField, HideInInspector]
+    private SaveLoadSystem _saveLoadSystem;
+
     private List<Item> _savedItems = new List<Item>();
 
     private InventoryItem _choosenItem = null;
 
-    private void Awake()
+    public void Initialize(List<InventoryItem> inventoryItems, SaveLoadSystem saveLoadSystem)
     {
+        _saveLoadSystem = saveLoadSystem;
+
+        _inventoryItems = inventoryItems;
+
         foreach (var item in _inventoryItems)
         {
+            if (item.Item.InInventory)
+                PushItemInInventory(item);
+            else
+                PushItemInDrop(item);
+
             item.OnBeginDragEvent += OnBeginDragItem;
             item.OnEndDragEvent += OnEndDragItem;
             item.OnPointerEnterEvent += OnPoinerEnterItem;
@@ -38,7 +50,7 @@ public class InventorySystem : MonoBehaviour
         }
 
         _inventoryButton.OnPointerUp += InventoryButtonOnPointerUp;
-        _dragger.OnItemDropEvent += OnItemDrop;
+        _dragger.OnItemDropEvent += PushItemInInventory;
 
         _inventoryButton.AddListener(InventorySwitchState);
     }
@@ -48,21 +60,7 @@ public class InventorySystem : MonoBehaviour
         if (_choosenItem == null)
             return;
 
-        foreach (var slot in _droppedSlots)
-        {
-            if (slot.IsEmpty)
-            {
-                _choosenItem.ChangeSlot();
-                _choosenItem.transform.position = slot.transform.position;
-                _choosenItem.transform.SetParent(slot.transform);
-                _choosenItem.SetNewStartPos(slot.transform.position);
-                slot.InventoryItem = _choosenItem;
-                _savedItems.Remove(_choosenItem.Item);
-                RemoveItemFromInventory?.Invoke(_choosenItem.Item.ItemID);
-                _choosenItem = null;
-                break;
-            }
-        }
+        PushItemInDrop(_choosenItem);
     }
 
     private void OnPointerExitItem(InventoryItem item)
@@ -76,22 +74,44 @@ public class InventorySystem : MonoBehaviour
         _choosenItem = item;
     }
 
-    private void OnItemDrop(InventoryItem item)
+    private void PushItemInDrop(InventoryItem item)
+    {
+        foreach (var slot in _droppedSlots)
+        {
+            if (slot.IsEmpty)
+            {
+                item.Item.InInventory = false;
+                _savedItems.Remove(item.Item);
+                ChangeSlot(item, slot);
+                RemoveItemFromInventory?.Invoke(item.Item.ItemID);
+                break;
+            }
+        }
+    }
+
+    private void PushItemInInventory(InventoryItem item)
     {
         foreach (var slot in _inventorySlots)
         {
             if (slot.IsEmpty)
             {
-                item.ChangeSlot();
-                item.transform.position = slot.transform.position;
-                item.transform.SetParent(slot.transform);
-                item.SetNewStartPos(slot.transform.position);
-                slot.InventoryItem = item;
+                item.Item.InInventory = true;
                 _savedItems.Add(item.Item);
+                ChangeSlot(item, slot);
                 AddItemInInventory?.Invoke(item.Item.ItemID);
                 break;
             }
         }
+    }
+
+    private void ChangeSlot(InventoryItem item, ItemSlot slot)
+    {
+        item.ChangeSlot();
+        item.transform.position = slot.transform.position;
+        item.transform.SetParent(slot.transform);
+        item.transform.localScale = Vector3.one;
+        item.SetNewStartPos(slot.transform.position);
+        slot.InventoryItem = item;
     }
 
     private void InventorySwitchState()
@@ -104,6 +124,8 @@ public class InventorySystem : MonoBehaviour
 
     private void OnApplicationQuit()
     {
+        _saveLoadSystem.SaveData(_savedItems);
+
         foreach (var item in _inventoryItems)
         {
             item.OnBeginDragEvent -= OnBeginDragItem;
@@ -114,7 +136,7 @@ public class InventorySystem : MonoBehaviour
 
         _inventoryButton.OnPointerUp -= InventoryButtonOnPointerUp;
 
-        _dragger.OnItemDropEvent -= OnItemDrop;
+        _dragger.OnItemDropEvent -= PushItemInInventory;
 
         _inventoryButton.RemoveListeners(InventorySwitchState);
     }
