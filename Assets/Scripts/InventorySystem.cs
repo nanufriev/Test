@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -11,9 +10,6 @@ public class InventorySystem : MonoBehaviour
 
     [SerializeField]
     private ItemDragSystem _dragger;
-
-    [SerializeField]
-    private List<InventoryItem> _inventoryItems;
     [SerializeField]
     private InventoryButton _inventoryButton;
     [SerializeField]
@@ -23,11 +19,9 @@ public class InventorySystem : MonoBehaviour
     [SerializeField]
     private List<ItemSlot> _inventorySlots;
 
-    [SerializeField, HideInInspector]
-    private SaveLoadSystem _saveLoadSystem;
-
+    private List<InventoryItem> _inventoryItems;
     private List<Item> _savedItems = new List<Item>();
-
+    private SaveLoadSystem _saveLoadSystem;
     private InventoryItem _choosenItem = null;
 
     public void Initialize(List<InventoryItem> inventoryItems, SaveLoadSystem saveLoadSystem)
