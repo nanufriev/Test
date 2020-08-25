@@ -11,16 +11,16 @@ public class SaveLoadSystem
     public List<Item> LoadData()
     {
         if (File.Exists(_jsonSavePath))
+        {
             try
             {
-                var data = JsonUtility.FromJson<SaveData>(File.ReadAllText(_jsonSavePath)); ;
-
-                return data.SavedItems;
+                return JsonUtility.FromJson<SaveData>(File.ReadAllText(_jsonSavePath)).SavedItems;
             }
             catch
             {
                 return new List<Item>();
             }
+        }
         else
             return new List<Item>();
     }
