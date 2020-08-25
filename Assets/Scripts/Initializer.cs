@@ -16,7 +16,7 @@ public class Initializer : MonoBehaviour
     {
         _saveLoadSystem = new SaveLoadSystem();
 
-        var itemsSettings = Resources.LoadAll<ItemSettings>("");
+        var itemsSettings = Resources.LoadAll<ItemSettings>(string.Empty);
 
         var loadedItems = _saveLoadSystem.LoadData();
 
