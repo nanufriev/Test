@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b7665ae4a4834dd4dae24c10506014f1, type: 3}
-  m_Name: Sword
+  m_Name: GreenBall
   m_EditorClassIdentifier: 
-  _id: 2
-  _name: "\u041C\u0435\u0447"
-  _weight: 5
-  _icon: {fileID: 21300000, guid: 6ffe8e0cc1c7c614e93a45bde3ab98ab, type: 3}
+  _id: 1
+  _name: GreenBall
+  _weight: 50
+  _icon: {fileID: 21300000, guid: ab50cf34856ee024b982c1bb08fe6db2, type: 3}
+  _color: {r: 0.41982365, g: 1, b: 0, a: 1}

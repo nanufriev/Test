@@ -3,79 +3,43 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class InventoryItem : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler, IPointerEnterHandler, IPointerExitHandler
+public class InventoryItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public event Action<InventoryItem> OnBeginDragEvent = delegate { };
-    public event Action<InventoryItem> OnEndDragEvent = delegate { };
     public event Action<InventoryItem> OnPointerEnterEvent = delegate { };
     public event Action<InventoryItem> OnPointerExitEvent = delegate { };
-    public event Action OnChangeSlot = delegate { };
 
     private Image _itemImage;
+    public Item Item { get; private set; }
+    public ItemObject ItemObject { get; private set; }
 
-    private Item _item;
-
-    private Vector3 _startPos;
-
-    public Item Item => _item;
-
-    public void Initialzie(Item item)
+    public void Initialzie()
     {
-        _item = item;
-
         _itemImage = GetComponent<Image>();
-        _itemImage.sprite = _item.ItemIcon;
     }
 
-    public void ChangeSlot()
+    public void Show(Item item, ItemObject itemObject)
     {
-        OnChangeSlot();
+        Item = item;
+        ItemObject = itemObject;
+        _itemImage.color = Item.ItemColor;
     }
 
-    void IEndDragHandler.OnEndDrag(PointerEventData eventData)
+    public void Hide()
     {
-        if (_item.InInventory)
-            return;
-
-        OnEndDragEvent(this);
-        transform.position = _startPos;
-        _itemImage.raycastTarget = true;
-    }
-
-    void IBeginDragHandler.OnBeginDrag(PointerEventData eventData)
-    {
-        if (_item.InInventory)
-            return;
-
-        OnBeginDragEvent(this);
-        _startPos = transform.position;
-        _itemImage.raycastTarget = false;
+        Item = null;
+        ItemObject = null;
+        _itemImage.color = Color.white;
     }
 
     void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Left)
+        if (Item != null && eventData.button == PointerEventData.InputButton.Left)
             OnPointerEnterEvent(this);
     }
 
     void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Left)
+        if (Item != null && eventData.button == PointerEventData.InputButton.Left)
             OnPointerExitEvent(this);
-    }
-
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (_item.InInventory)
-            return;
-
-        var worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        transform.position = new Vector3(worldPosition.x, worldPosition.y, transform.position.z);
-    }
-
-    public void SetNewStartPos(Vector3 pos)
-    {
-        _startPos = pos;
     }
 }

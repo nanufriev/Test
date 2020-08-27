@@ -4,11 +4,11 @@ using UnityEngine;
 public class Initializer : MonoBehaviour
 {
     [SerializeField]
-    private GameObject _inventoryItemPrefab;
+    private GameObject _itemObjectPrefab;
     [SerializeField]
     private InventorySystem inventorySystem;
 
-    private List<InventoryItem> _inventoryItems = new List<InventoryItem>();
+    private List<ItemObject> _itemObjects = new List<ItemObject>();
 
     private SaveLoadSystem _saveLoadSystem;
 
@@ -21,19 +21,19 @@ public class Initializer : MonoBehaviour
         var loadedItems = _saveLoadSystem.LoadData();
 
         Item tempItem = null;
-        InventoryItem tempInventoryItem = null;
+        ItemObject tempItemObject = null;
 
         foreach (var itemSetings in itemsSettings)
         {
             tempItem = new Item(itemSetings);
             tempItem.InInventory = loadedItems.Exists(x => x.ItemID == itemSetings.ItemID);
 
-            tempInventoryItem = Instantiate(_inventoryItemPrefab).GetComponent<InventoryItem>();
-            tempInventoryItem.Initialzie(tempItem);
+            tempItemObject = Instantiate(_itemObjectPrefab).GetComponent<ItemObject>();
 
-            _inventoryItems.Add(tempInventoryItem);
+            tempItemObject.Initialize(tempItem);
+            _itemObjects.Add(tempItemObject);
         }
 
-        inventorySystem.Initialize(_inventoryItems, _saveLoadSystem);
+        inventorySystem.Initialize(_itemObjects, _saveLoadSystem);
     }
 }

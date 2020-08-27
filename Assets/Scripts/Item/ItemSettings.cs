@@ -10,10 +10,10 @@ public class ItemSettings : ScriptableObject
     [SerializeField]
     private float _weight;
     [SerializeField]
-    private Sprite _icon;
+    private Color _color;
 
     public int ItemID => _id;
     public string Name => _name;
     public float Weight => _weight;
-    public Sprite Icon => _icon;
+    public Color Color => _color;
 }

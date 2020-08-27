@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b7665ae4a4834dd4dae24c10506014f1, type: 3}
-  m_Name: Elexir
+  m_Name: BlackBall
   m_EditorClassIdentifier: 
-  _id: 0
-  _name: "\u042D\u043B\u0435\u043A\u0441\u0438\u0440"
-  _weight: 0.1
-  _icon: {fileID: 21300000, guid: c8124cc33e9590c4fabc68929c0cc23e, type: 3}
+  _id: 2
+  _name: BlackBall
+  _weight: 10
+  _icon: {fileID: 21300000, guid: 6ffe8e0cc1c7c614e93a45bde3ab98ab, type: 3}
+  _color: {r: 0, g: 0, b: 0, a: 1}

@@ -9,7 +9,8 @@ public class Item
 
     [SerializeField]
     public bool InInventory { get; set; } = false;
-    public Sprite ItemIcon => _itemSettings.Icon;
+    public Color ItemColor => _itemSettings.Color;
+    public float Weight => _itemSettings.Weight;
     public int ItemID => _itemSettings.ItemID;
     
     public Item(ItemSettings itemSettings)

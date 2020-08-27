@@ -11,53 +11,46 @@ public class InventorySystem : MonoBehaviour
     [SerializeField]
     private ItemDragSystem _dragger;
     [SerializeField]
-    private InventoryButton _inventoryButton;
+    private InventoryObject _inventoryObject;
     [SerializeField]
     private InventoryPanel _inventoryPanel;
     [SerializeField]
-    private List<ItemSlot> _droppedSlots;
+    private List<InventoryItem> _inventorySlots;
     [SerializeField]
-    private List<ItemSlot> _inventorySlots;
+    private Transform _dropPoint;
 
-    private List<InventoryItem> _inventoryItems;
+    private List<ItemObject> _itemObjects =  new List<ItemObject>();
     private List<Item> _savedItems = new List<Item>();
     private SaveLoadSystem _saveLoadSystem;
     private InventoryItem _choosenItem = null;
 
-    public void Initialize(List<InventoryItem> inventoryItems, SaveLoadSystem saveLoadSystem)
+    public void Initialize(List<ItemObject> itemObjects, SaveLoadSystem saveLoadSystem)
     {
         _saveLoadSystem = saveLoadSystem;
 
-        _inventoryItems = inventoryItems;
+        _itemObjects = itemObjects;
 
-        foreach (var item in _inventoryItems)
+        foreach (var item in _inventorySlots)
         {
-            if (item.Item.InInventory)
-                PushItemInInventory(item, true);
-            else
-                PushItemInDrop(item, true);
-
-            item.OnBeginDragEvent += OnBeginDragItem;
-            item.OnEndDragEvent += OnEndDragItem;
+            item.Initialzie();
             item.OnPointerEnterEvent += OnPoinerEnterItem;
             item.OnPointerExitEvent += OnPointerExitItem;
         }
 
-        _inventoryButton.OnPointerUp += InventoryButtonOnPointerUp;
+        foreach (var item in _itemObjects)
+        {
+            if (item.Item.InInventory)
+            {
+                PushItemInInventory(item, true);
+            }
+        }
+
         _dragger.OnItemDropEvent += OnItemDropInInventory;
-
-        _inventoryButton.AddListener(InventorySwitchState);
+        _inventoryObject.OnInventoryOpen += InventoryOpen;
+        _inventoryObject.OnInventoryClose += InventoryClose;
     }
 
-    private void InventoryButtonOnPointerUp()
-    {
-        if (_choosenItem == null)
-            return;
-
-        PushItemInDrop(_choosenItem);
-    }
-
-    private void OnItemDropInInventory(InventoryItem item)
+    private void OnItemDropInInventory(ItemObject item)
     {
         PushItemInInventory(item);
     }
@@ -73,40 +66,39 @@ public class InventorySystem : MonoBehaviour
         _choosenItem = item;
     }
 
-    private void PushItemInDrop(InventoryItem item, bool mute = false)
+    private void DropItem(InventoryItem item, bool mute = false)
     {
-        foreach (var slot in _droppedSlots)
+        item.Item.InInventory = false;    
+        _savedItems.Remove(item.Item);
+        item.ItemObject.Rigidbody.velocity = Vector3.zero;
+        item.ItemObject.gameObject.SetActive(true);
+
+        if (!mute)
         {
-            if (slot.IsEmpty)
-            {
-                item.Item.InInventory = false;
-                _savedItems.Remove(item.Item);
-                ChangeSlot(item, slot);
-
-                if (!mute)
-                {
-                    RemoveItemFromInventory?.Invoke(item.Item.ItemID);
-                    _saveLoadSystem.SaveData(_savedItems);
-                }
-
-                break;
-            }
+            RemoveItemFromInventory?.Invoke(item.Item.ItemID);
+            _saveLoadSystem.SaveData(_savedItems);
         }
+
+        item.Hide();
+        _choosenItem = null;
     }
 
-    private void PushItemInInventory(InventoryItem item, bool mute = false)
+    private void PushItemInInventory(ItemObject itemObj, bool mute = false)
     {
         foreach (var slot in _inventorySlots)
         {
-            if (slot.IsEmpty)
+            if (slot.Item == null)
             {
-                item.Item.InInventory = true;
-                _savedItems.Add(item.Item);
-                ChangeSlot(item, slot);
+                itemObj.Item.InInventory = true;
+                slot.Show(itemObj.Item, itemObj);
+                itemObj.gameObject.SetActive(false);
+                itemObj.transform.position = _dropPoint.position;
+
+                _savedItems.Add(itemObj.Item);
 
                 if (!mute)
                 {
-                    AddItemInInventory?.Invoke(item.Item.ItemID);
+                    AddItemInInventory?.Invoke(itemObj.Item.ItemID);
                     _saveLoadSystem.SaveData(_savedItems);
                 }
                 break;
@@ -114,50 +106,35 @@ public class InventorySystem : MonoBehaviour
         }
     }
 
-    private void ChangeSlot(InventoryItem item, ItemSlot slot)
+    private void InventoryOpen()
     {
-        item.ChangeSlot();
-        item.transform.position = slot.transform.position;
-        item.transform.SetParent(slot.transform);
-        item.transform.localScale = Vector3.one;
-        item.SetNewStartPos(slot.transform.position);
-        slot.InventoryItem = item;
+        if (!_inventoryPanel.IsShow)
+            _inventoryPanel.Show();
     }
 
-    private void InventorySwitchState()
+    private void InventoryClose()
     {
         if (_inventoryPanel.IsShow)
             _inventoryPanel.Hide();
-        else
-            _inventoryPanel.Show();
+
+        if (_choosenItem == null)
+            return;
+
+        DropItem(_choosenItem);
     }
 
     private void OnApplicationQuit()
     {
-        foreach (var item in _inventoryItems)
+        foreach (var item in _inventorySlots)
         {
-            item.OnBeginDragEvent -= OnBeginDragItem;
-            item.OnEndDragEvent -= OnEndDragItem;
             item.OnPointerEnterEvent -= OnPoinerEnterItem;
             item.OnPointerExitEvent -= OnPointerExitItem;
         }
 
-        _inventoryButton.OnPointerUp -= InventoryButtonOnPointerUp;
-
         _dragger.OnItemDropEvent -= OnItemDropInInventory;
 
-        _inventoryButton.RemoveListeners(InventorySwitchState);
-    }
-
-
-    private void OnEndDragItem(InventoryItem item)
-    {
-        _dragger.EndDrag();
-    }
-
-    private void OnBeginDragItem(InventoryItem item)
-    {
-        _dragger.BeginDrag(item);
+        _inventoryObject.OnInventoryOpen -= InventoryOpen;
+        _inventoryObject.OnInventoryClose += InventoryClose;
     }
 }
 
