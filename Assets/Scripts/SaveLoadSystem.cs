@@ -34,9 +34,6 @@ public class SaveLoadSystem
 
         string jsonData = JsonUtility.ToJson(_saveData);
 
-        if (!File.Exists(_jsonSavePath))
-            File.Create(_jsonSavePath);
-
         File.WriteAllText(_jsonSavePath, jsonData);
 
     }
